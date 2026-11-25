@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Perfect Grade Display</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #ffffff;
+      --surface: #f5f6f8;
+      --text: #1d2125;
+      --muted: #626b75;
+      --border: #d5d9de;
+      --accent: #1a5fb4;
+      --error: #c01c28;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1e1f22;
+        --surface: #2a2c30;
+        --text: #e6e8eb;
+        --muted: #9aa3ad;
+        --border: #3e4247;
+        --accent: #78aeed;
+        --error: #f66151;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 12px;
+      background: var(--bg);
+      color: var(--text);
+      font: 13px/1.4 system-ui, sans-serif;
+    }
+    h1 { font-size: 15px; margin: 0 0 8px; }
+    .bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      align-items: center;
+      padding: 10px;
+      margin-bottom: 12px;
+      background: var(--surface);
+      border-radius: 8px;
+    }
+    .bar label { display: flex; gap: 6px; align-items: center; }
+    .bar .default input { width: 70px; }
+    .bar .actions { margin-left: auto; display: flex; gap: 6px; }
+    input, textarea, button {
+      font: inherit;
+      color: inherit;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 7px;
+    }
+    button { cursor: pointer; background: var(--surface); }
+    button:hover { border-color: var(--accent); }
+    input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+    input.invalid { border-color: var(--error); outline-color: var(--error); }
+    .row {
+      padding: 10px 0;
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr 90px;
+      gap: 6px 8px;
+    }
+    .row .name { font-weight: 600; align-self: center; overflow-wrap: anywhere; }
+    .row .current { grid-column: 1 / -1; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+    .row input { width: 100%; }
+    .row textarea { grid-column: 1 / -1; width: 100%; min-height: 34px; resize: vertical; }
+    .backup { margin-top: 16px; padding-top: 10px; border-top: 1px solid var(--border); }
+    .backup h2 { font-size: 13px; margin: 0 0 4px; }
+    .backup-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .backup .hint { margin: 6px 0; }
+    .tag {
+      display: inline-block;
+      padding: 0 6px;
+      border-radius: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 11px;
+    }
+    .row .generate { grid-column: 1 / -1; justify-self: start; font-size: 12px; padding: 3px 8px; }
+    .random { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; margin-bottom: 8px; }
+    .random input { width: 64px; }
+    .ai { margin-bottom: 8px; }
+    .ai .hint { margin: 6px 0 0; min-height: 1.4em; }
+    button:disabled { opacity: 0.6; cursor: default; }
+    .hint, .empty { color: var(--muted); }
+    .hint { margin: 0 0 8px; font-size: 12px; }
+    .empty { padding: 24px 4px; text-align: center; }
+  </style>
+</head>
+<body>
+  <h1>Displayed grades</h1>
+  <div id="empty" class="empty" hidden>
+    Open a LEARN Grades or Assignments page in this tab, then click Refresh.
+    <p><button id="retry" type="button">Refresh</button></p>
+  </div>
+  <div id="editor" hidden>
+    <div class="bar">
+      <label><input id="enabled" type="checkbox"> Enabled</label>
+      <label title="On full marks, remove the remark after each question's score. Below full marks, remarks stay to explain the lost marks.">
+        <input id="match-feedback" type="checkbox"> Feedback matches grade</label>
+      <label class="default">Default <input id="default" type="text" placeholder="100"></label>
+      <div class="actions">
+        <button id="refresh" type="button">Refresh</button>
+        <button id="clear" type="button">Clear rows</button>
+      </div>
+    </div>
+    <p class="hint">Enter a percentage (<code>85</code>) or points (<code>17/20</code>) for each row.
+      Empty rows use the default. A comment replaces the Comments and Assessments cell.</p>
+    <div class="random">
+      <label>Random from <input id="random-min" type="number" min="0" max="100" step="1"> to 100</label>
+      <button id="randomize" type="button">🎲 Randomize all grades</button>
+    </div>
+    <div class="ai">
+      <button id="fill" type="button">✨ Fill all feedback comments</button>
+      <p id="status" class="hint" role="status"></p>
+    </div>
+    <div id="rows"></div>
+  </div>
+  <section class="backup">
+    <h2>Backup</h2>
+    <p class="hint">Your grades are saved in Chrome and survive closing it. Export a backup file
+      in case you remove the extension or move its folder.</p>
+    <div class="backup-actions">
+      <button id="export" type="button">Export backup</button>
+      <button id="import" type="button">Import backup</button>
+      <input id="import-file" type="file" accept="application/json,.json" hidden>
+    </div>
+    <p id="backup-status" class="hint" role="status"></p>
+  </section>
+  <script src="shared.js"></script>
+  <script src="gemini.js"></script>
+  <script src="sidepanel.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+# Dependencies (reinstall with `npm install`)
+node_modules/
+
+# Exported grade backups: personal data, keep them out of the repo
+perfect-grade-display-backup-*.json
+
+# Packaged extension and its signing key (the .pem must never be shared)
+*.crx
+*.pem
+*.zip
+
+# Logs
+npm-debug.log*
+*.log
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

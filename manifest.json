@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Perfect Grade Display",
+  "version": "1.2.0",
+  "description": "Displays custom grades on the Waterloo LEARN grades and assignments pages.",
+  "permissions": ["storage", "sidePanel"],
+  "action": {
+    "default_title": "Edit displayed grades"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://learn.uwaterloo.ca/d2l/lms/grades/my_grades/main.d2l*",
+        "https://learn.uwaterloo.ca/d2l/lms/dropbox/user/folders_list.d2l*"
+      ],
+      "js": ["shared.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
